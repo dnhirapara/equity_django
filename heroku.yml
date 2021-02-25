@@ -1,0 +1,21 @@
+# setup:
+  # addons:
+  #   - plan: heroku-redis
+  #     as: cache
+
+build:
+  docker:
+    web: ./Dockerfile
+    celery: ./Dockerfile
+    celery-beat: ./Dockerfile
+    nginx: ./nginx/Dockerfile
+  config:
+    SECRET_KEY: 'z2=*f-3&n%1@f^^a)b$5qmvy%-fp5+dlpjd4g!n434to=rb@qq'
+    DEBUG: 1
+    DJANGO_ALLOWED_HOSTS: localhost 127.0.0.1 [::1]
+
+run:
+  web: gunicorn bhavcopy.wsgi:application --bind 0.0.0.0:$PORT
+  # web: python manage.py runserver 
+  celery: celery -A bhavcopy worker -l info
+  celery-beat: celery -A bhavcopy beat -l info
