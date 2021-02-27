@@ -1,6 +1,6 @@
 from .base import INSTALLED_APPS, MIDDLEWARE
 from celery.schedules import crontab
-
+import os
 import bhavcopy.tasks
 
 INSTALLED_APPS += [
@@ -20,8 +20,8 @@ MIDDLEWARE.insert(2, 'corsheaders.middleware.CorsMiddleware')
 # Redis
 
 CACHE_TTL = 0
-# REDIS_URL = "redis"
-REDIS_URL = "redis"
+REDIS_URL = os.environ.get("REDIS_URL")
+# REDIS_URL = "127.0.0.1"
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -43,8 +43,8 @@ CELERY_RESULT_BACKEND = "redis://"+REDIS_URL+":6379/2"
 CELERY_BEAT_SCHEDULE = {
     "sample_task": {
         "task": "bhavcopy.tasks.sample_task",
-        # "schedule": crontab(minute='5', hour='18', day_of_week=[1, 2, 3, 4, 5]),
-        "schedule": crontab(minute='*/10'),
+        "schedule": crontab(minute='6', hour='18', day_of_week=[1, 2, 3, 4, 5]),
+        # "schedule": crontab(minute='*/1'),
     },
 }
 

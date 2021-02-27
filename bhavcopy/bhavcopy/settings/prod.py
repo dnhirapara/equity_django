@@ -21,12 +21,14 @@ print(BASE_DIR)
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'z2=*f-3&n%1@f^^a)b$5qmvy%-fp5+dlpjd4g!n434to=rb@qq'
+# SECRET_KEY = 'z2=*f-3&n%1@f^^a)b$5qmvy%-fp5+dlpjd4g!n434to=rb@qq'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get("DEBUG", default=1))
 
-ALLOWED_HOSTS = ["localhost" ,"127.0.0.1" ,"[::1]","bhavcopy-1.herokuapp.com"]
+# ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]", "bhavcopy-1.herokuapp.com"]
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(' ')
 
 
 # Application definition
@@ -107,7 +109,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 

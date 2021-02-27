@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.core.cache import cache
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
-
+from pytz import timezone
 from celery import shared_task
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
@@ -93,6 +93,7 @@ def clear_cache(conn, prefix):
         count += 1
     return count
 
+
 def wait_until_currunt_day(day, month, year):
     today_date = date.today()
     wait_secs = 300
@@ -103,15 +104,20 @@ def wait_until_currunt_day(day, month, year):
         wait_secs -= 60
         if wait_secs < 0:
             return 0
+    return 1
+
 
 @shared_task
 def sample_task():
 
     today_date = date.today()
+    locale_to_use = timezone('Asia/Kolkata')
     file_name = get_zip()
     day, month, year = parse_date(file_name)
-    # day, month, year = wait_until_currunt_day(day, month, year)
-    
+    if int(os.environ.get("TASK", default=1)) == 1:
+        if not wait_until_currunt_day(day, month, year):
+            return 0
+
     shutil.rmtree(settings.MEDIA_ROOT)
     os.mkdir(settings.MEDIA_ROOT)
 

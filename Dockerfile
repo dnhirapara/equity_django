@@ -1,7 +1,7 @@
 FROM python:3.8-alpine
 
-RUN apk update
 RUN apk --update add redis
+RUN apk --update add nano supervisor 
 
 ENV HOME=/home/app
 RUN mkdir $HOME
@@ -25,8 +25,11 @@ COPY ./entrypoint.sh /home/app/web/entrypoint.sh
 COPY ./entrypoint.sh /home/app/web/bhavcopy/entrypoint.sh
 
 COPY ./bhavcopy $APP_HOME
+ADD /supervisor /home/app/web/supervisor
+
+CMD ["supervisord","-c","/home/app/web/supervisor/service_script.conf"]
 
 # ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
-ENTRYPOINT ["/home/app/web/entrypoint.sh"]
+# ENTRYPOINT ["/home/app/web/entrypoint.sh"]
 
 # CMD gunicorn bhavcopy.wsgi:application --bind 0.0.0.0:$PORT
