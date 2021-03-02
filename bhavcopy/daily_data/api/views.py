@@ -63,7 +63,8 @@ def get_list(request):
         response = {
             'data': data,
             'total': total,
-            'date': redis_cache.get('date')
+            'date': redis_cache.get('date'),
+            'entire_total':len(redis_keys)
         }
         return Response(response, status=200)
 

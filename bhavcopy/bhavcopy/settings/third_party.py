@@ -2,6 +2,8 @@ from .base import INSTALLED_APPS, MIDDLEWARE
 from celery.schedules import crontab
 import os
 import bhavcopy.tasks
+import pytz
+from pytz import timezone
 
 INSTALLED_APPS += [
     'rest_framework',
@@ -38,16 +40,24 @@ REDIS_PORT = 6379
 
 CELERY_BROKER_URL = "redis://"+REDIS_URL+":6379/2"
 CELERY_RESULT_BACKEND = "redis://"+REDIS_URL+":6379/2"
-
-
-CELERY_BEAT_SCHEDULE = {
-    "sample_task": {
-        "task": "bhavcopy.tasks.sample_task",
-        "schedule": crontab(minute='6', hour='18', day_of_week=[1, 2, 3, 4, 5]),
-        # "schedule": crontab(minute='*/1'),
-    },
-}
-
+CELERY_TIMEZONE = timezone('Asia/Kolkata')
+CELERY_BEAT_SCHEDULE = {}
+if int(os.environ.get("RUN_TASK", default=1)):
+    CELERY_BEAT_SCHEDULE = {
+        "fetch_csv_task": {
+            "task": "bhavcopy.tasks.fetch_csv_task",
+            # "schedule": crontab(minute='6', hour='18', day_of_week=[1, 2, 3, 4, 5]),
+            "schedule": crontab(minute='*/1'),
+        },
+    }
+else:
+    CELERY_BEAT_SCHEDULE = {
+        "fetch_csv_task": {
+            "task": "bhavcopy.tasks.fetch_csv_task",
+            "schedule": crontab(minute='6', hour='18', day_of_week=[1, 2, 3, 4, 5]),
+            # "schedule": crontab(minute='*/1'),
+        },
+    }
 
 CORS_ALLOW_ALL_ORIGINS = True
 

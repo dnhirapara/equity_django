@@ -95,7 +95,8 @@ def clear_cache(conn, prefix):
 
 
 def wait_until_currunt_day(day, month, year):
-    today_date = date.today()
+    locale_to_use = timezone('Asia/Kolkata')
+    today_date = date.today(locale_to_use)
     wait_secs = 300
     while day != today_date.day or month != today_date.month or year != today_date.year:
         time.sleep(60)
@@ -108,10 +109,9 @@ def wait_until_currunt_day(day, month, year):
 
 
 @shared_task
-def sample_task():
-
-    today_date = date.today()
+def fetch_csv_task():
     locale_to_use = timezone('Asia/Kolkata')
+    today_date = date.today()
     file_name = get_zip()
     day, month, year = parse_date(file_name)
     if int(os.environ.get("TASK", default=1)) == 1:
@@ -125,9 +125,11 @@ def sample_task():
     parsed_date = datetime(year=int(str(20)+str(year)),
                            month=int(month), day=int(day))
     redis_cache = redis_con()
+    redis_cache.flushdb() 
     clear_cache(redis_cache, "id")
     redis_cache.delete("date")
-    redis_cache.set("date", str(datetime.now()))
+    redis_cache.set("date", str(datetime.now(locale_to_use)))
+    redis_cache.set("csv_total", len(csv_data))
     print(redis_cache.get('date'))
     total = 0
     for i in range(1, len(csv_data)):
@@ -137,5 +139,5 @@ def sample_task():
         redis_cache.delete("id:"+csv_data[i][0]+":"+csv_data[i][1])
         redis_cache.rpush(
             "id:"+csv_data[i][0]+":"+csv_data[i][1], *row_list)
-        redis_cache.persist("id:"+csv_data[i][0])
+        redis_cache.persist("id:"+csv_data[i][0]+":"+csv_data[i][1])
     return total
