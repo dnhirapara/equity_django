@@ -36,6 +36,7 @@ CACHES = {
 }
 REDIS_HOST = REDIS_URL
 REDIS_PORT = 6379
+# tasks.fetch_csv_task()
 
 
 CELERY_BROKER_URL = "redis://"+REDIS_URL+":6379/2"
@@ -54,7 +55,7 @@ else:
     CELERY_BEAT_SCHEDULE = {
         "fetch_csv_task": {
             "task": "bhavcopy.tasks.fetch_csv_task",
-            "schedule": crontab(minute='6', hour='18', day_of_week=[1, 2, 3, 4, 5]),
+            "schedule": crontab(minute='2', hour='18', day_of_week=[1, 2, 3, 4, 5]),
             # "schedule": crontab(minute='*/1'),
         },
     }

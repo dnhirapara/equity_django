@@ -17,6 +17,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from .tasks import *
+is_task_ready = True
+print("Running fetch csv")
+if is_task_ready:
+    fetch_csv_task.delay()
+    is_task_ready = False
+print("fetch csv task added in queue")
 
 urlpatterns = [
     path('admin/', admin.site.urls),

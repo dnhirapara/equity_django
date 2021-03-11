@@ -55,7 +55,7 @@ def get_list(request):
             keys = redis_keys[i].decode('utf-8')
             redis_data = redis_cache.lrange(keys, 0, -1)
             row_data = {}
-            col_data = ["name", "open", "close", "high", "low"]
+            col_data = ["NAME", "OPEN", "HIGH", "LOW", "CLOSE"]
             for i in range(len(redis_data)):
                 row_data[col_data[i]] = str(
                     redis_data[i].decode('utf-8')).strip()
@@ -92,7 +92,7 @@ def get_csv(request, key):
             with open(file_path, mode='w') as equity_file:
                 equity_file = csv.writer(
                     equity_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                equity_file.writerow(["name", "open", "close", "high", "low"])
+                equity_file.writerow(["NAME", "OPEN", "HIGH", "LOW", "CLOSE"])
 
                 for i in range(len(redis_keys)):
                     keys = redis_keys[i].decode('utf-8')

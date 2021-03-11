@@ -96,7 +96,7 @@ def clear_cache(conn, prefix):
 
 def wait_until_currunt_day(day, month, year):
     locale_to_use = timezone('Asia/Kolkata')
-    today_date = date.today(locale_to_use)
+    today_date = datetime.now(locale_to_use)
     wait_secs = 300
     while day != today_date.day or month != today_date.month or year != today_date.year:
         time.sleep(60)
@@ -114,9 +114,15 @@ def fetch_csv_task():
     today_date = date.today()
     file_name = get_zip()
     day, month, year = parse_date(file_name)
+    equity_date = str(datetime.now(locale_to_use))
     if int(os.environ.get("TASK", default=1)) == 1:
         if not wait_until_currunt_day(day, month, year):
-            return 0
+            with open('./equity_data.txt', 'r') as f:
+                equity_date = f.readline()
+        else:
+            with open('./equity_data.txt', 'x') as f:
+                equity_date = datetime.now(locale_to_use)
+                f.write(str(datetime.now(locale_to_use)))
 
     shutil.rmtree(settings.MEDIA_ROOT)
     os.mkdir(settings.MEDIA_ROOT)
@@ -125,10 +131,11 @@ def fetch_csv_task():
     parsed_date = datetime(year=int(str(20)+str(year)),
                            month=int(month), day=int(day))
     redis_cache = redis_con()
-    redis_cache.flushdb() 
+    redis_cache.flushdb()
     clear_cache(redis_cache, "id")
     redis_cache.delete("date")
-    redis_cache.set("date", str(datetime.now(locale_to_use)))
+
+    redis_cache.set("date", str(equity_date))
     redis_cache.set("csv_total", len(csv_data))
     print(redis_cache.get('date'))
     total = 0
